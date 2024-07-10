@@ -30,14 +30,22 @@ def getReserve(DateToReserve_date):
 
 @api_scope.route('/reserve' , methods = ['POST'])
 def addReserve():
-    newReserve = {
-        "date": request.json["date"],
-        "table available" : request.json["table available"]
-    }
-    DateToReserve.append(newReserve)
+    for date in DateToReserve:
+        if date.get('date') == request.json['date']:
+            Exists = True
+            break
     
-    return jsonify({'message': "Reserve added sucessfully", "Reserve":DateToReserve})
-
+    if(not Exists):
+        newReserve = {
+            "date": request.json["date"],
+            "table available" : request.json["table available"]
+        }
+        DateToReserve.append(newReserve)
+        
+        return jsonify({'message': "Reservetion added sucessfully", "Reserve":DateToReserve})
+    else:
+        return jsonify({'message': 'This reservation has already created'})
+    
 @api_scope.route ('/reserve/<string:DateToReserve_date>', methods = ['PUT'])
 def editReserve (DateToReserve_date):
     DateToReserveFound = [ reserve for reserve in DateToReserve if reserve['date'] == DateToReserve_date ]
@@ -48,10 +56,11 @@ def editReserve (DateToReserve_date):
             if date.get('date') == request.json['date']:
                 Exists = True
                 break
+
         if(not Exists):
             DateToReserveFound[0]['date'] = request.json['date']
             DateToReserveFound[0]['table available'] = request.json['table available']
-            return jsonify({'message' : 'Reserve Updated', 'reserve':DateToReserveFound[0]})
+            return jsonify({'message' : 'Reservetion Updated', 'reservetion':DateToReserveFound[0]})
         else:
             return jsonify('Esa fecha ya existe y no coincide con la fecha que estas actualizando')
     else:
