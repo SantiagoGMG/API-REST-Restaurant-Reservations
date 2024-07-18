@@ -13,12 +13,14 @@ from app.controller import controllerDB
 import sqlite3 as sql
 
 db_path = os.path.join("app", "database", "Restaurant.db")
-conn = sql.connect(db_path)
+#conn = sql.connect(db_path)
 
 def format():
+    conn = sql.connect(db_path)
     dbList = controllerDB.readRow()
    # Convertir las tuplas a diccionarios con claves específicas
     formattedDB = [{'date': date, 'table available': tables , 'ID': id} for date,tables,id in dbList]
+    conn.close()
     return formattedDB
 #app = Flask(__name__)
 api_scope = Blueprint("api", __name__)
@@ -109,7 +111,7 @@ def editReserve (DateToReserve_date):
     else:
         return jsonify({'message': 'Product not found'})
 """    
-
+#Actualiza las reservaciones por medio de la fecha
 @api_scope.route ('/reserve/<string:DateToReserve_date>', methods = ['PUT'])
 def editReservation (DateToReserve_date):
     DateToReserveFound = [ reserve for reserve in format() if reserve['date'] == DateToReserve_date ]
@@ -134,12 +136,14 @@ def editReservation (DateToReserve_date):
     else:
         return jsonify({'message': 'Product not found'})
         
+# Elimina las reservaciones por medio de la fecha 
 @api_scope.route('/reserve/<string:DateToReserve_date>', methods = ['DELETE'])
 def deleteReserve (DateToReserve_date):
-    DateToReserveFound =[ reserve for reserve in DateToReserve if reserve['date'] == DateToReserve_date]
+    DateToReserveFound =[ reserve for reserve in format() if reserve['date'] == DateToReserve_date]
     if(len(DateToReserveFound) > 0):
-        DateToReserve.remove(DateToReserveFound)
-        return jsonify ({'message': 'Reserve Deleted', 'Reserve': DateToReserve})
+        controllerDB.deleteRowForDate(DateToReserve_date)
+        #DateToReserve.remove(DateToReserveFound)
+        return jsonify ({'message': 'Reserve Deleted', 'Reserve': format()})
     else:    
         return jsonify ({'message': 'Reserve not found'})
 
