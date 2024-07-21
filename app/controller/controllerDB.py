@@ -14,9 +14,9 @@ def createTable():
     cursor.execute(
         """CREATE TABLE dateToReserve
                 (
+                ID INTEGER PRIMARY KEY AUTOINCREMENT,
                   date DATE,
-                  tableAvailable INTEGER,
-                  ID INTEGER PRIMARY KEY AUTOINCREMENT
+                  tableAvailable INTEGER
                 ) """
                    )
     conn.commit()
@@ -73,6 +73,7 @@ def searchForDate(date):
     conn.commit()
     conn.close()
     print(datos)
+    return datos
 
 def updateTables(date, tableAvailable):
     db_path = os.path.join("app", "database", "Restaurant.db")
@@ -100,7 +101,6 @@ def updateForID (updateDate, updateTable, ID):
     cursor = conn.cursor()
     instruccion = f"UPDATE dateToReserve SET date = '{updateDate}',tableAvailable = {updateTable} WHERE ID = {ID}"
     cursor.execute(instruccion)
-
     conn.commit()
     conn.close()
 
@@ -126,10 +126,10 @@ def deleteRowForID(deleteID):
 
 
 if __name__ == "__main__":
-    #createDB()
-    #createTable()
-    #insertRow('2025-01-01',22)
-    #insertRow('2025-01-02',10)
+    createDB()
+    createTable()
+    insertRow('2025-01-01',22)
+    insertRow('2025-01-02',10)
     #readRow()
     reservation = [
         ('2025-01-03',35),
@@ -141,4 +141,5 @@ if __name__ == "__main__":
     #updateTables('2025-01-03',25)
     #updateDate('2025-01-05','2025-01-04')
     #deleteRowForDate('2025-01-04')
-    #updateForID('2025-01-04',2,4)
+    #update8ForID('2025-01-04',2,4)
+    readRow()

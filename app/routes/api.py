@@ -1,10 +1,10 @@
 # src/routes/app.py
 import sys
 import os
-from flask import Flask , jsonify , request , Blueprint, redirect , url_for , flash
+from flask import Flask , jsonify , request , Blueprint, redirect , url_for , flash ,render_template
 from app.controller import controllerDB
 import sqlite3 as sql
-
+from app.routes import routes
 #app = Flask(__name__)
 api_scope = Blueprint("api", __name__)
 
@@ -23,7 +23,7 @@ def format():
     conn = sql.connect(db_path)
     dbList = controllerDB.readRow()
    # Convertir las tuplas a diccionarios con claves específicas
-    formattedDB = [{'date': date, 'table available': tables , 'ID': id} for date,tables,id in dbList]
+    formattedDB = [{'ID': id,'date': date, 'table available': tables } for id,date,tables in dbList]
     conn.close()
     return formattedDB
 
@@ -95,7 +95,8 @@ def addReserve():
             return redirect(url_for('views.home'))
         else:
             #return jsonify({'message': 'This reservation has already created'})
-            return 'This reservation has already created'
+            flash('ERROR : This reservation has already created')
+            return redirect(url_for('views.home'))
 
         
     
@@ -121,13 +122,14 @@ def editReserve (DateToReserve_date):
         return jsonify({'message': 'Product not found'})
 """    
 #Actualiza las reservaciones por medio de la fecha
-@api_scope.route ('/reserve/<string:DateToReserve_date>', methods = ['PUT'])
+@api_scope.route ('/edit/<string:DateToReserve_date>', methods = ['PUT'])
 def editReservation (DateToReserve_date):
     DateToReserveFound = [ reserve for reserve in format() if reserve['date'] == DateToReserve_date ]
 
     if (len(DateToReserveFound) > 0):
         Exists = False
         for date in format():
+            #if date.get('date') == request.json['date']:
             if date.get('date') == request.json['date']:
                 Exists = True
                 break
@@ -144,18 +146,61 @@ def editReservation (DateToReserve_date):
             return jsonify('Esa fecha ya existe y no coincide con la fecha que estas actualizando')
     else:
         return jsonify({'message': 'Product not found'})
+    
+ #Metodo GET pare editar en html no acepta otros metodos que no sean GET
+@api_scope.route ('/edit/<string:DateToReserve_date>')
+def editReservation2 (DateToReserve_date):
+    DataFound = controllerDB.searchForDate(DateToReserve_date)
+    print(DataFound[0])
+    return render_template('edit_reservation.html', reservation = DataFound[0])
+
+# crea la nueva reservacion despues de haber sido editada
+@api_scope.route('/update/<ID>' , methods = ['POST'])
+def update_reservation(ID):
+    if request.method == 'POST':
+        print(request.form["date"])
+        Exists = False
+        contador = 0
+        for date in format():
+            if date['date'] == request.form['date'] and date['ID'] != ID:
+                Exists = True
+                break
         
+        if(not Exists):
+            controllerDB.updateForID(request.form["date"],request.form["table available"],ID)
+            flash('Reservetion added sucessfully')
+            return redirect(url_for('views.home'))
+        else:
+            flash('ERROR : This date reservation has already created')
+            return redirect(url_for('views.home'))
+
+
 # Elimina las reservaciones por medio de la fecha 
-@api_scope.route('/reserve/<string:DateToReserve_date>', methods = ['DELETE'])
+@api_scope.route('/delete/<string:DateToReserve_date>', methods = ['DELETE'])
 def deleteReserve (DateToReserve_date):
     DateToReserveFound =[ reserve for reserve in format() if reserve['date'] == DateToReserve_date]
     if(len(DateToReserveFound) > 0):
         controllerDB.deleteRowForDate(DateToReserve_date)
         #DateToReserve.remove(DateToReserveFound)
-        return jsonify ({'message': 'Reserve Deleted', 'Reserve': format()})
+        #return jsonify ({'message': 'Reserve Deleted', 'Reserve': format()})
+        return routes.home()
     else:    
-        return jsonify ({'message': 'Reserve not found'})
+        #return jsonify ({'message': 'Reserve not found'})
+        return 'Reservation not found'
 
+#es un metodo get, porque el home.html y en general los html no reciben metodos que no sean GET
+@api_scope.route('/delete/<string:DateToReserve_date>')
+def deleteReservetion (DateToReserve_date):
+    DateToReserveFound =[ reserve for reserve in format() if reserve['date'] == DateToReserve_date]
+    if(len(DateToReserveFound) > 0):
+        controllerDB.deleteRowForDate(DateToReserve_date)
+        #DateToReserve.remove(DateToReserveFound)
+        #return jsonify ({'message': 'Reserve Deleted', 'Reserve': format()})
+        flash('Reservetion deleted sucessfully')
+        return redirect(url_for('views.home'))
+    else:    
+        #return jsonify ({'message': 'Reserve not found'})
+        return 'Reservation not found'
 
 """
 if __name__ == '__main__':

@@ -12,3 +12,27 @@
         Save
     </button>
 </form> 
+
+<table>
+    <thead>
+        <tr>
+            <td>ID</td>
+            <td>Date</td>
+            <td>Tables available</td>
+            <td>Operations</td>
+        </tr>
+    </thead>
+    <tbody>
+        {% for date in dates%}
+        <tr>
+            <td>{{date.0}}</td>
+            <td>{{date.1}}</td>
+            <td>{{date.2}}</td>
+            <td>
+                <a href="/edit/{{date.1}}">Edit</a>
+                <a href="/delete/{{date.1}}" method="DELETE">Delete</a>
+            </td>
+        </tr>
+        {%endfor%}
+    </tbody>
+</table>
