@@ -1,19 +1,23 @@
 # src/routes/app.py
 import sys
 import os
-from flask import Flask , jsonify , request , Blueprint
-from flask_mysqldb import MySQL
+from flask import Flask , jsonify , request , Blueprint, redirect , url_for , flash
+from app.controller import controllerDB
+import sqlite3 as sql
+
+#app = Flask(__name__)
+api_scope = Blueprint("api", __name__)
 
 # Añadir la carpeta project_root/src al sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
-from app.database.DateToReserve import DateToReserve
-
-from app.controller import controllerDB
-import sqlite3 as sql
+# sirve para comunicarse con un .py que servia como base de datos
+#from app.database.DateToReserve import DateToReserve
 
 db_path = os.path.join("app", "database", "Restaurant.db")
-#conn = sql.connect(db_path)
+
+#setting sesion
+#esta en config.py y se inicializa en __init__.py
 
 def format():
     conn = sql.connect(db_path)
@@ -22,11 +26,9 @@ def format():
     formattedDB = [{'date': date, 'table available': tables , 'ID': id} for date,tables,id in dbList]
     conn.close()
     return formattedDB
-#app = Flask(__name__)
-api_scope = Blueprint("api", __name__)
+
 
 #TESTER
-
 @api_scope.route('/ping', methods = ['GET'])
 def ping():
     return jsonify({'message' : 'pong'})
@@ -72,23 +74,30 @@ def addReserve():
 # crea reservaciones
 @api_scope.route('/reserve' , methods = ['POST'])
 def addReserve():
-    print(format())
-    Exists = False
-    for date in format():
-        if date['date'] == request.json['date']:
-            Exists = True
-            break
-    
-    if(not Exists):
-        newReserve = {
-            "date": request.json["date"],
-            "tableAvailable" : request.json["table available"]
-        }
-        controllerDB.insertRow(request.json["date"],request.json["table available"])
+    if request.method == 'POST':
+        print(request.form["date"])
+        #print(format())
+        Exists = False
+        for date in format():
+            #if date['date'] == request.json['date']:
+            if date['date'] == request.form['date']:
+                Exists = True
+                break
         
-        return jsonify({'message': "Reservetion added sucessfully", "Reserve":format()})
-    else:
-        return jsonify({'message': 'This reservation has already created'})
+        if(not Exists):
+
+            #controllerDB.insertRow(request.json["date"],request.json["table available"])
+            controllerDB.insertRow(request.form["date"],request.form["table available"])
+
+            #return jsonify({'message': "Reservetion added sucessfully", "Reserve":format()})
+            #return 'Reservetion added sucessfully'
+            flash('Reservetion added sucessfully')
+            return redirect(url_for('views.home'))
+        else:
+            #return jsonify({'message': 'This reservation has already created'})
+            return 'This reservation has already created'
+
+        
     
 """   
 @api_scope.route ('/reserve/<string:DateToReserve_date>', methods = ['PUT'])

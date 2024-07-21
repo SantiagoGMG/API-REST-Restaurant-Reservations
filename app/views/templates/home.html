@@ -1,15 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=<device-width>, initial-scale=1.0">
-    <title>Home</title>
-</head>
-<body>
-    <h1>Soy el home</h1>
-    <li>1</li>
-    <li>2</li>
-    <li>3</li>
-    <button>RESERVAR</button>
-</body>
-</html>
+{% with messages = get_flashed_messages() %}
+{% if messages%}
+{% for message in messages%}
+<p> {{message}}</p>
+{% endfor %}
+{% endif %}
+{% endwith %}
+<form action="/reserve" method="POST">
+    <input type="date" name="date">
+    <input type="text" name="table available" placeholder="number of tables available">
+    <button type="submit">
+        Save
+    </button>
+</form> 
