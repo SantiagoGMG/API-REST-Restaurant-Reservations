@@ -158,11 +158,9 @@ def editReservation2 (DateToReserve_date):
 @api_scope.route('/update/<ID>' , methods = ['POST'])
 def update_reservation(ID):
     if request.method == 'POST':
-        print(request.form["date"])
         Exists = False
-        contador = 0
         for date in format():
-            if date['date'] == request.form['date'] and date['ID'] != ID:
+            if date['date'] == request.form['date'] and date['ID'] is not ID:
                 Exists = True
                 break
         
