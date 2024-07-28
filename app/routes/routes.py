@@ -2,6 +2,7 @@
 
 from flask import Blueprint, render_template , session
 from app.controller import controllerDB
+
 global_scope = Blueprint("views", __name__)
 
 
