@@ -159,8 +159,9 @@ def editReservation2 (DateToReserve_date):
 def update_reservation(ID):
     if request.method == 'POST':
         Exists = False
+
         for date in format():
-            if date['date'] == request.form['date'] and date['ID'] is not ID:
+            if date['date'] == request.form['date'] and str(date['ID']) != str(ID):
                 Exists = True
                 break
         
