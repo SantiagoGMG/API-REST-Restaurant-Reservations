@@ -19,9 +19,17 @@
     <div class="col-md-5">
         <div class="card card-body">
             <form action="/reserve" method="POST">
-                <input type="date" name="date">
-                <input type="text" name="table available" placeholder="number of tables available">
-                <button type="submit">Save</button>
+                <div class="form-group">
+                    <input type="date" name="date" class = "form-control">
+                </div>
+                <div class="form-group">
+                    <input type="text" name="table available" placeholder="Number of tables available" class = "form-control">
+                </div>
+                <div class="form-group">
+                    <button type="submit" class = "btn btn-success w-100">
+                        Save
+                    </button>
+                </div>
             </form> 
         </div>
     </div>
@@ -42,8 +50,8 @@
                     <td>{{ date.1 }}</td>
                     <td>{{ date.2 }}</td>
                     <td>
-                        <a href="/edit/{{ date.1 }}">Edit</a>
-                        <a href="/delete/{{ date.1 }}" method="DELETE">Delete</a>
+                        <a href="/edit/{{ date.1 }}" class = "btn btn-secondary">Edit</a>
+                        <a href="/delete/{{ date.1 }}" method="DELETE" class = "btn btn-danger">Delete</a>
                     </td>
                 </tr>
                 {% endfor %}
