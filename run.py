@@ -1,4 +1,5 @@
 from app import app
 
 if __name__ == "__main__":
-    app.run(debug=True,host = "0.0.0.0", port=4000)  # No añadir parámetros, modificar directamente en Config
+    app.run(debug=True,#host = "0.0.0.0", 
+            port=4000)  # No añadir parámetros, modificar directamente en Config
