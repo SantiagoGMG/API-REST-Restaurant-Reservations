@@ -20,7 +20,7 @@ def format():
     conn = sql.connect(db_path)
     dbList = controllerDB.readRow()
    # Convertir las tuplas a diccionarios con claves específicas
-    formattedDB = [{'ID': id,'date': date, 'table available': tables } for id,date,tables in dbList]
+    formattedDB = [{'ID': id,'date': date, 'number_of_tables': tables } for id,date,tables in dbList]
     conn.close()
     return formattedDB
 
@@ -29,6 +29,57 @@ def format():
 @api_scope.route('/ping', methods = ['GET'])
 def ping():
     return jsonify({'message' : 'pong'})
+
+
+#Vista de la tabla de todas las mesas del restaurante
+@api_scope.route('/Table')
+def editNumberTables():
+    data = controllerDB.readRowMesas()
+    return render_template('TablaMesas.html',dates=data)
+
+#crea la mesa con su silla y dirige a la vista de la tabla con todas las mesas del restaurante 
+@api_scope.route('/Table', methods = ['POST'])
+def AllTables():
+    if request.method == 'POST':
+        Total_chair = request.form["cantidad"]
+        print(Total_chair)
+        controllerDB.insertRowMesas(Total_chair)
+        #return render_template('TablaMesas.html')
+        #return editNumberTables()
+        data = controllerDB.readRowMesas()
+        # metodo en la clase routes.py
+        return redirect(url_for('views.Mesas'))
+
+#Dirige a la vista de crear una mesa
+@api_scope.route('/MakeTable')
+def MakeTable():
+    data = controllerDB.readLastRowMesas()
+    if data == None:
+        return render_template('crearMesas.html', Last_ID = 1)
+    else:
+        return render_template('crearMesas.html', Last_ID = data[0]+1)
+
+# edita una mesa
+@api_scope.route('/editTable/<string:ID>')
+def editTable(ID):
+    DataFound = controllerDB.searchForID_Mesas(ID)
+    print(DataFound)
+    return render_template('edit_Mesa.html', mesa = DataFound[0])
+
+#update de una mesa
+@api_scope.route('/update/<ID>' , methods = ['POST'])
+def update_Table(ID):
+    if request.method == 'POST':
+        controllerDB.updateMesa(ID,request.form['new_number'])
+        return redirect(url_for('views.Mesas'))
+
+# Elimina una mesa
+@api_scope.route('/deleteTable/<string:ID>')
+def delete_Mesa(ID):
+    controllerDB.deleteRowMesasForID(ID)
+    #return routes.Mesas()
+    return redirect(url_for('views.Mesas'))
+
 
 # crea reservaciones por medio de un form de html
 @api_scope.route('/reserve' , methods = ['POST'])
@@ -42,7 +93,7 @@ def addReserve():
                 break
         
         if(not Exists):
-            controllerDB.insertRow(request.form["date"],request.form["table available"])
+            controllerDB.insertRow(request.form["date"],request.form["number_of_tables"])
             flash('Reservetion added sucessfully')
             return redirect(url_for('views.home'))
         else:
@@ -68,7 +119,7 @@ def update_reservation(ID):
                 break
         
         if(not Exists):
-            controllerDB.updateForID(request.form["date"],request.form["table available"],ID)
+            controllerDB.updateForID(request.form["date"],request.form["number_of_tables"],ID)
             flash('Reservetion added sucessfully')
             return redirect(url_for('views.home'))
         else:

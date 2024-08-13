@@ -1,0 +1,29 @@
+{% extends 'layout.html'%}
+
+{% block body %}
+
+<div class="col-md-7 offset-md-3">
+    <a href="/MakeTable" method="POST" class = "btn btn-success btn-secondary">Add Table</a>
+    <table class="table table-striped table-bordered bg-white table-sm">
+        <thead>
+            <tr>
+                <td>ID</td>
+                <td>Maximum number of chairs</td>
+                <td>Operations</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for date in dates %}
+            <tr>
+                <td style="text-align: center;">{{ date.0 }}</td>
+                <td style="text-align: center;">{{ date.1 }}</td>
+                <td>
+                    <a href="/editTable/{{ date.0 }}" class = "btn btn-secondary">Edit</a>
+                    <a href="/deleteTable/{{ date.0 }}" method="DELETE" class = "btn btn-danger btn-delete">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

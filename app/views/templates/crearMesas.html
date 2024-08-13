@@ -1,0 +1,21 @@
+{% extends 'layout.html'%}
+
+{% block body %}
+<div class="col-md-4 offset-md-4">
+    <div class="card card-body">
+        <form action="/Table" method="POST">
+            <div class="form-group">
+                <p>Mesa {{Last_ID}} </p>
+            </div>
+            <div class="form-group">
+                <input type="text" name="cantidad" placeholder="Maximum number of chair" class = "form-control">
+            </div>
+            <div class="form-group">
+                <button type="submit" class = "btn btn-success w-100">
+                    Save
+                </button>
+            </div>
+        </form> 
+    </div>
+</div>
+{% endblock %}
